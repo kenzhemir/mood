@@ -21,7 +21,13 @@ const service = "moodle_mobile_app";
 const username = argv.username;
 const password = argv.password;
 
-const getToken = async (username, password) => {
+/**
+ * This functions returns a promise that fetches token from moodle website
+ * @param username
+ * @param password
+ * @returns {Promise<void>}
+ */
+async function getToken(username, password) {
     try {
         const response = await axios.get(MOODLE_AUTH_URL, {params: {username, password, service}});
         return response.data;
@@ -30,6 +36,9 @@ const getToken = async (username, password) => {
         throw new Error("Network error");
     }
 }
+
+
+//// Testing purposes only
 
 getToken(username, password)
     .then(res => {
