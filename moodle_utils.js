@@ -1,6 +1,8 @@
 const axios = require("axios");
 const yargs = require("yargs");
 
+const config = require("./config");
+
 const argv = yargs
     .option('username', {
         alias: 'u',
@@ -14,7 +16,7 @@ const argv = yargs
     .argv;
 
 
-const MOODLE_URL = "http://moodle.nu.edu.kz";
+const MOODLE_URL = config.MOODLE_URL;
 const MOODLE_API_URL = `${MOODLE_URL}/webservice/rest/server.php`;
 const MOODLE_AUTH_URL = `${MOODLE_URL}/login/token.php`;
 const service = "moodle_mobile_app";
@@ -27,25 +29,24 @@ const password = argv.password;
  * @param password
  * @returns {Promise<void>}
  */
-async function getToken(username, password) {
+export async function getToken(username, password) {
+    let response;
     try {
-        const response = await axios.get(MOODLE_AUTH_URL, {params: {username, password, service}});
-        return response.data;
+        response = await axios.get(MOODLE_AUTH_URL, {params: {username, password, service}});
     } catch(e) {
         console.error(e.message);
         throw new Error("Network error");
     }
+    if (!response || !response.data || !response.data.token){
+        const errStr = (response.data.error) ? ': '+response.data.error : '';
+        throw new Error(`Error requesting token${errStr}!`);
+    }
+    return response.data.token;
 }
 
 
 //// Testing purposes only
 
 getToken(username, password)
-    .then(res => {
-        if (res.error){
-            console.log(`Error requesting token: ${res.error}`);
-        } else {
-            console.log(`Token has been acquired! Token: ${res.token}`);
-        }
-    })
+    .then(token => console.log(`Token acquired: ${token}`))
     .catch(error => console.log(`Error requesting token: ${error.message}`));
