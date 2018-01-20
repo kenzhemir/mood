@@ -1,7 +1,7 @@
 const axios = require("axios");
 const yargs = require("yargs");
 
-const config = require("./config");
+const config = require("../config");
 
 const argv = yargs
     .option('username', {
